@@ -17,12 +17,25 @@ export default function AuthChoice() {
     try {
       setIsAnonymousLoading(true);
       setLoading(true);
-      const user = await signInAnonymous();
-      setUser({
-        id: user.uid,
-        anonymousId: user.uid,
-        createdAt: new Date().toISOString(),
-      });
+      
+      try {
+        const user = await signInAnonymous();
+        setUser({
+          id: user.uid,
+          anonymousId: user.uid,
+          createdAt: new Date().toISOString(),
+        });
+      } catch (firebaseError: any) {
+        console.warn('Firebase auth not configured, using local auth:', firebaseError.message);
+        // Fallback to local anonymous ID if Firebase auth fails
+        const anonymousId = 'anon_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        setUser({
+          id: anonymousId,
+          anonymousId: anonymousId,
+          createdAt: new Date().toISOString(),
+        });
+      }
+      
       router.replace('/welcome');
     } catch (error: any) {
       console.error('Anonymous sign-in failed:', error);
