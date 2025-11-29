@@ -14,6 +14,10 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" />
+        <Stack.Screen name="splash" />
+        <Stack.Screen name="auth-choice" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="signup" />
         <Stack.Screen name="welcome" />
         <Stack.Screen name="how-it-works" />
         <Stack.Screen name="circle-matching" />
