@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stay Confirmation Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#6a25f4",
+            "background-light": "#f6f5f8",
+            "background-dark": "#0C0A1E",
+            "accent-violet": "#9D80FF",
+            "text-light-lavender": "#EAE6FF"
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .glow {
+        box-shadow: 0 0 15px 5px rgba(157, 128, 255, 0.3), 0 0 30px 10px rgba(157, 128, 255, 0.2), 0 0 45px 15px rgba(157, 128, 255, 0.1);
+    }
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark dark font-display group/design-root overflow-x-hidden">
+<div class="flex flex-col items-center justify-between flex-1 w-full max-w-md mx-auto p-4 text-center">
+<div class="flex-grow flex flex-col items-center justify-center w-full pt-16 pb-8">
+<div class="relative w-full max-w-[280px] aspect-square flex items-center justify-center mb-12">
+<div class="absolute inset-0 bg-contain bg-center bg-no-repeat glow rounded-full" data-alt="A glowing, evolving circular graphic with interconnected patterns, symbolizing growth and continuity within a community circle." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDLsZWzotboapSh2KuaCLTfceWsqgGhGT2drWAwygABqPG9KOggJQ5hZwUpRcfofzwWrPjTbv9IOOnrZTY9dE2W4q5FMzPTGF-kO8QZ6jrJNYhAHkYIolDAw2gMCUY0q-FrIy0gbeZ23DIam01R2nGOQjtT-Igo0w7m3x8trQ7vWmluj-QJOov6KfVpshdXzjU98-PHF7kWQfvQEqwb9WI_qCFM0WdBMAVZ4IERoY6UkO9-F3dQp_3N5OXE-26F0YKoHRTnHKGn499f");'></div>
+</div>
+<h1 class="text-accent-violet tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-3 pt-6">The Circle Continues</h1>
+<p class="text-text-light-lavender text-base font-normal leading-normal pb-3 pt-1 px-4 text-center max-w-sm">
+          You've chosen to stay. Your journey together grows, ready for new connections and shared experiences in the next cycle.
+        </p>
+</div>
+<div class="w-full px-4 py-3">
+<button class="flex min-w-[84px] w-full max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Return to Your Circle</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Entering Your Circle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#6a25f4",
+              "background-light": "#f6f5f8",
+              "background-dark": "#161022",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            animation: {
+              pulse: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'subtle-glow': 'subtle-glow 10s ease-in-out infinite alternate',
+            },
+            keyframes: {
+              'subtle-glow': {
+                '0%': { transform: 'translate(0, 0) scale(1)', opacity: '0.4' },
+                '100%': { transform: 'translate(10px, -20px) scale(1.1)', opacity: '0.5' },
+              }
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .glow-text {
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.3), 0 0 12px rgba(106, 37, 244, 0.2);
+      }
+      .ring-glow {
+        box-shadow: 0 0 20px 5px rgba(106, 37, 244, 0.4), 
+                    inset 0 0 20px 5px rgba(106, 37, 244, 0.3);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#0C0A09] font-display antialiased">
+<div class="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden">
+<!-- Background Glows -->
+<div class="absolute top-[-20%] left-[-20%] h-96 w-96 rounded-full bg-primary/20 blur-3xl filter animate-subtle-glow" style="animation-delay: -2s;"></div>
+<div class="absolute bottom-[-15%] right-[-15%] h-80 w-80 rounded-full bg-[#4F46E5]/20 blur-3xl filter animate-subtle-glow"></div>
+<div class="z-10 flex flex-col items-center justify-center gap-12 text-center text-white">
+<!-- Central Animated Ring -->
+<div class="relative flex h-56 w-56 items-center justify-center">
+<div class="absolute h-full w-full animate-pulse rounded-full border-2 border-primary/40 ring-glow"></div>
+<div class="absolute h-[85%] w-[85%] animate-pulse rounded-full border-2 border-primary/60" style="animation-delay: -0.5s;"></div>
+<div class="absolute h-[70%] w-[70%] animate-pulse rounded-full border-2 border-primary/80" style="animation-delay: -1s;"></div>
+</div>
+<!-- Loading UI -->
+<div class="flex w-64 flex-col gap-6">
+<!-- BodyText Component -->
+<p class="text-base font-normal leading-normal text-slate-200 glow-text">Connecting you anonymously...</p>
+<!-- ProgressBar Component -->
+<div class="flex flex-col gap-3">
+<div class="flex justify-between gap-6">
+<p class="text-base font-medium leading-normal text-white glow-text">Entering your circle...</p>
+</div>
+<div class="rounded-full bg-primary/20">
+<div class="h-2 rounded-full bg-white" style="width: 75%;"></div>
+</div>
+</div>
+</div>
+<!-- Optional Subtle Logo -->
+<div class="absolute bottom-10">
+<span class="material-symbols-outlined text-3xl text-white/20">
+                    waves
+                </span>
+</div>
+</div>
+</div>
+</body></html>

@@ -5,9 +5,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../constants/theme';
 import { Button } from '../components/Button';
 import { CircularProgress } from '../components/CircularProgress';
+import { useStore } from '../store/useStore';
 
 export default function Welcome() {
   const router = useRouter();
+  const { completeOnboarding } = useStore();
+
+  const handleContinue = async () => {
+    await completeOnboarding();
+    router.push('/how-it-works');
+  };
+
+  const handleSkip = async () => {
+    await completeOnboarding();
+    router.push('/circle-matching');
+  };
 
   return (
     <View style={styles.container}>
@@ -54,8 +66,8 @@ export default function Welcome() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button title="Continue" onPress={() => router.push('/how-it-works')} />
-        <Text style={styles.skipText} onPress={() => router.push('/circle-matching')}>
+        <Button title="Continue" onPress={handleContinue} />
+        <Text style={styles.skipText} onPress={handleSkip}>
           Skip
         </Text>
       </View>

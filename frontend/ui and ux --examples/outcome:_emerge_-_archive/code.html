@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Memory Archive</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6a25f4",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#161022",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glow-effect {
+            box-shadow: 0 0 15px 2px rgba(106, 37, 244, 0.3), 0 0 25px 5px rgba(106, 37, 244, 0.2);
+        }
+        .glow-effect:hover {
+            box-shadow: 0 0 20px 4px rgba(106, 37, 244, 0.45), 0 0 30px 8px rgba(106, 37, 244, 0.3);
+            transform: scale(1.03);
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="flex items-center p-4 pb-2 bg-background-light dark:bg-background-dark sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-white/80" style="font-size: 28px;">arrow_back</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Memory Archive</h2>
+<div class="flex size-12 shrink-0"></div> <!-- Spacer to center title -->
+</div>
+<!-- Main Content: Image Grid of Memories -->
+<div class="flex-grow p-4">
+<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-5">
+<!-- Memory Fragment Card 1 -->
+<div class="bg-cover bg-center flex flex-col gap-3 items-center rounded-full justify-center aspect-square cursor-pointer glow-effect" data-alt="Abstract glowing purple and blue orb representing a memory from May 13 to May 20" style='background-image: linear-gradient(0deg, rgba(22, 16, 34, 0.4) 0%, rgba(22, 16, 34, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCBTcMILaello3lADoJZnO0yLo1ZhAZHkJfgaKuQDsh4hkIPV5MwqqWC2cbI_7BeHO4zY39p8IlceD9kHK4q9VMA04sgF2Ung-fZ0ABiNsVrRv9YDTH8Ry0crCMrDkOngP4xkE2Y4H4NJwNLTuOgcIuSbnh9f4LTP_bXUGMy720XUaEpq9x1XypU-KQzxXBgMsmnNKPoFVZT5o42B7ckidEiE95XbRoxIJLyttxtgJh0m2Kko1_QK7J6V44ZLmvMCQB8jcvzsh0MaQc");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">May 13 - May 20</p>
+</div>
+<!-- Memory Fragment Card 2 -->
+<div class="bg-cover bg-center flex flex-col gap-3 items-center rounded-full justify-center aspect-square cursor-pointer glow-effect" data-alt="Abstract glowing pink and purple orb representing a memory from May 6 to May 13" style='background-image: linear-gradient(0deg, rgba(22, 16, 34, 0.4) 0%, rgba(22, 16, 34, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCSXG3o8L4al5ZdeQlbCewC0TCYgLHgKVmydvQe0GCLCxnVWSUIKHa_C_LIdMaHpBBLdvcj7acwxe8kxooirAB2KCxG8Pdc7khqyyiC1cZ7IbaKtgmLhj4l0F59cfjDq_vq-4tbDwJTKyhZcz5-9rihOCY7cF19aQmvJsPLFrHG5pXCEsqf4a0w0nhF4HjfaaD--5s4ZURusVGyDRCKPzEsrfmvjRJ9n11njVQ2jaLjytK6AspwVum8sVFye_CEX9CTD0CjlNoKLJuO");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">May 6 - May 13</p>
+</div>
+<!-- Memory Fragment Card 3 -->
+<div class="bg-cover bg-center flex flex-col gap-3 items-center rounded-full justify-center aspect-square cursor-pointer glow-effect" data-alt="Abstract glowing blue and dark purple orb representing a memory from Apr 29 to May 6" style='background-image: linear-gradient(0deg, rgba(22, 16, 34, 0.4) 0%, rgba(22, 16, 34, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEQX-gPIywioA78mY_s7qesQFbGlWhyZ56NdZy785o8vz0aao_LknGH6vM5tLYscg-o5uOk4PCRHzBR-nrSq41XNeRVgL0usFWTTKlTX_2YW2e75BtW-p_1DD1fqW4o2EK8b5Y9EKTrV8n-wple7rzJAF7AQdDIaZNY_azw2NWd1HrJtEZTE9A-0zzFToMzd1mz4bpQo1V13yV7ueHWnX87qXffs29qJ_fB8SCGTDvT0VcVA7xJRF33TxHNn3-_plbPtYAhmG_XcIG");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Apr 29 - May 6</p>
+</div>
+<!-- Memory Fragment Card 4 -->
+<div class="bg-cover bg-center flex flex-col gap-3 items-center rounded-full justify-center aspect-square cursor-pointer glow-effect" data-alt="Abstract glowing purple and magenta orb representing a memory from Apr 22 to Apr 29" style='background-image: linear-gradient(0deg, rgba(22, 16, 34, 0.4) 0%, rgba(22, 16, 34, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6VvW1mbxU0M7NYTDy717vCrIKfg3C6pS2cA2Ufzh2GrkL5T22rjsy-Ovnphh6aFK_ghV5FQLW0fRtzPcxYWwtXZvBg34jmKMX9BWjMTmGHny853_EZdg6CupnKVHWxtrRjL3gZsABeGLGPzAQ0Iov5i-GEIC-SGme8jfxEeuGyrpqwtetzRx369-0Rv_XhHLFbZ9T5NRPDSVp6wazTud-Q8b9AGYnjMsA0i_NvvF0gUbRP4hXYyYw4pWHBrxaruM3Vg09z45zqNef");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Apr 22 - Apr 29</p>
+</div>
+<!-- Memory Fragment Card 5 -->
+<div class="bg-cover bg-center flex flex-col gap-3 items-center rounded-full justify-center aspect-square cursor-pointer glow-effect" data-alt="Abstract glowing deep violet orb representing a memory from Apr 15 to Apr 22" style='background-image: linear-gradient(0deg, rgba(22, 16, 34, 0.4) 0%, rgba(22, 16, 34, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCRL7b68dH18BfKbCw_Jcx-vCNpOkTY9Loi2M6829ViEflfn6leoYgn2ZrcKnnV5tJ-vXYbhN9hDW96yynvS-fWw6S-G3NKz5vfKxync_pqrqimeRgg84ePlZGWNUvS9aVF8IGRqyXeuzG0Z0WCKtzEekoAD1aCIK54GNtrmR1daITZwzn5luEVg9phmmauh0auK4g7eu9mTYSRGoWBmLN_qYGcNcfY3IszEKxLGoNRFei8MxV3hAh4dxiAz7JGK-wrGnBNG1nh_dii");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Apr 15 - Apr 22</p>
+</div>
+<!-- Memory Fragment Card 6 -->
+<div class="bg-cover bg-center flex flex-col gap-3 items-center rounded-full justify-center aspect-square cursor-pointer glow-effect" data-alt="Abstract glowing violet and blue orb representing a memory from Apr 8 to Apr 15" style='background-image: linear-gradient(0deg, rgba(22, 16, 34, 0.4) 0%, rgba(22, 16, 34, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAhcFVOJJIBZsoyC1x5YQFsCTuB_5GnJzgAuoDZ71Bs1wN7FCY00uH9xkv9yyz1Ljik-tatdtRyi9hYWcnJ0AsZVdmu8ZCmPhIyG47lYO6oWQFZcxRN2GxTxh1EErXFNDDhTOJJfp0qqatNHXbWd9bd0uh1sY-bt6Jr21b7RQEXzG4XFwH96xpmDLDowAi4g1G0ZGwGtcoQxdVRbwiMWaTX_YR3CfcHZo1syP6G_WT1QDPsdAdr8awcckE09Vo19k3XHAbKvOTEU24x");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Apr 8 - Apr 15</p>
+</div>
+</div>
+</div>
+<!-- Optional: Empty State. Uncomment this section to show the empty state instead of the grid.
+        <div class="flex flex-col items-center justify-center flex-grow px-4 py-6 text-center">
+            <div class="flex flex-col items-center gap-6">
+                <div class="relative w-48 h-48">
+                    <div class="absolute inset-0 bg-primary/30 rounded-full blur-2xl"></div>
+                    <div class="relative flex items-center justify-center w-full h-full bg-cover bg-center rounded-full" style='background-image: url("https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=800&auto=format&fit=crop");' data-alt="A single glowing orb representing a future memory.">
+                    </div>
+                </div>
+                <div class="flex max-w-xs flex-col items-center gap-2">
+                    <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">A Place for Your Memories</p>
+                    <p class="text-white/70 text-sm font-normal leading-normal">
+                        After your first 7-day circle ends, its essence will be saved here for you to revisit.
+                    </p>
+                </div>
+                <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-primary/30 text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/50 transition-colors">
+                    <span class="truncate">Go to Current Circle</span>
+                </button>
+            </div>
+        </div>
+        -->
+</div>
+</body></html>

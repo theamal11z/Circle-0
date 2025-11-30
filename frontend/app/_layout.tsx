@@ -1,8 +1,28 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { colors } from '../constants/theme';
+import { auth } from '../config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useStore, loadOnboardingStatus } from '../store/useStore';
 
 export default function RootLayout() {
+  const { setUser } = useStore();
+
+  React.useEffect(() => {
+    loadOnboardingStatus();
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
+        setUser({
+          id: fbUser.uid,
+          anonymousId: fbUser.uid,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    });
+    return unsubscribe;
+  }, [setUser]);
+
   return (
     <>
       <StatusBar style="light" />

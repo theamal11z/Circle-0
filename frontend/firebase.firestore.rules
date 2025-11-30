@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper to check if the signed-in user is a participant of the circle
+    function isCircleParticipant(circleId) {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/circles/$(circleId)).data.participants.hasAny([request.auth.uid]);
+    }
+
+    // Circles: only participants can read/update. Any signed-in user can create a new circle that includes them.
+    match /circles/{circleId} {
+      allow read: if isCircleParticipant(circleId);
+
+      // Create: must be signed in and include themselves in participants array
+      allow create: if isSignedIn() &&
+        (request.resource.data.participants is list) &&
+        request.resource.data.participants.hasAny([request.auth.uid]) &&
+        request.resource.data.status is string &&
+        request.resource.data.day is int;
+
+      // Update: only participants can update limited fields
+      allow update: if isCircleParticipant(circleId) &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['participants','day','status','createdAt']);
+
+      // Delete: deny by default
+      allow delete: if false;
+    }
+
+    // Messages: only participants of the circle can read. Only the author can create messages for their circle.
+    match /messages/{messageId} {
+      allow read: if isSignedIn() && isCircleParticipant(resource.data.circleId);
+
+      allow create: if isSignedIn() &&
+        request.resource.data.authorId == request.auth.uid &&
+        isCircleParticipant(request.resource.data.circleId) &&
+        request.resource.data.audioUrl is string &&
+        request.resource.data.segmentIndex is int &&
+        request.resource.data.durationMs is int;
+
+      // Updates/deletes disabled for safety (messages are immutable)
+      allow update, delete: if false;
+    }
+  }
+}

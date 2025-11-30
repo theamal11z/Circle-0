@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
 import { colors, typography, spacing } from '../constants/theme';
 import { useStore } from '../store/useStore';
-
-const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+import { auth, firestore, signInAnonymous } from '../config/firebase';
+import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 
 export default function Circle() {
   const router = useRouter();
   const { currentCircle, user, messages, setMessages } = useStore();
   const [activeSegment, setActiveSegment] = useState<number | null>(null);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentCircle) {
@@ -21,11 +22,27 @@ export default function Circle() {
 
   const loadMessages = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/messages/${currentCircle?._id}`);
-      const data = await response.json();
-      setMessages(data);
+      setLoadError(null);
+      setLoadingMessages(true);
+      if (!currentCircle?._id) return;
+      // Ensure authenticated before querying (rules require auth)
+      if (!auth.currentUser) {
+        await signInAnonymous();
+      }
+      const messagesRef = collection(firestore, 'messages');
+      const q = query(
+        messagesRef,
+        where('circleId', '==', currentCircle._id),
+        orderBy('createdAt', 'asc')
+      );
+      const snap = await getDocs(q);
+      const data = snap.docs.map((d) => ({ _id: d.id, ...(d.data() as any) }));
+      setMessages(data as any);
     } catch (error) {
       console.error('Error loading messages:', error);
+      setLoadError('Failed to load messages');
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -116,6 +133,20 @@ export default function Circle() {
             </View>
           </View>
         </View>
+
+        {/* Loading / Error */}
+        {loadingMessages && (
+          <View style={[styles.infoCard, { marginTop: spacing.lg }]}>
+            <Ionicons name="refresh" size={20} color={colors.calmBlue} />
+            <Text style={styles.infoText}>Loading messages…</Text>
+          </View>
+        )}
+        {!!loadError && (
+          <View style={[styles.infoCard, { marginTop: spacing.lg }]}> 
+            <Ionicons name="warning-outline" size={20} color={colors.warmOrange} />
+            <Text style={styles.infoText}>{loadError}</Text>
+          </View>
+        )}
 
         {/* Info Card */}
         <View style={styles.infoCard}>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Voice Community Onboarding</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 300,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#8A2BE2",
+              "background-light": "#f6f5f8",
+              "background-dark": "#101020",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            boxShadow: {
+              'glow': '0 0 15px 5px rgba(138, 43, 226, 0.3), 0 0 20px 10px rgba(75, 0, 130, 0.2)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-dvh w-full flex-col bg-background-dark dark group/design-root overflow-hidden">
+<header class="absolute top-0 left-0 right-0 z-10 p-6 flex justify-end">
+<button class="text-[#E6E6FA]/60 font-display text-sm font-medium tracking-wide hover:text-[#E6E6FA] transition-colors">Skip</button>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center text-center">
+<!-- Welcome Illustration -->
+<div class="relative flex h-64 w-64 items-center justify-center mb-10">
+<div class="absolute h-full w-full rounded-full bg-primary/20 blur-2xl"></div>
+<div class="absolute h-48 w-48 rounded-full bg-primary/30"></div>
+<div class="absolute h-48 w-48 rounded-full border border-primary/40 animate-pulse-slow"></div>
+<span class="material-symbols-outlined text-[#E6E6FA] text-8xl" style="font-variation-settings: 'wght' 200;">record_voice_over</span>
+</div>
+<!-- Text Content -->
+<div class="px-6">
+<h1 class="text-[#E6E6FA] tracking-tight text-[32px] font-bold leading-tight pb-3 pt-6 font-display">Welcome to Aura</h1>
+<p class="text-[#E6E6FA]/80 text-base font-normal leading-relaxed pb-3 pt-1 px-4 font-display">Discover a safe space to share, listen, and connect through the power of your voice.</p>
+</div>
+</main>
+<footer class="w-full pb-8 pt-4 px-6 flex flex-col items-center">
+<!-- Page Indicators -->
+<div class="flex w-full flex-row items-center justify-center gap-3 py-5">
+<div class="h-2 w-2 rounded-full bg-primary"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+</div>
+<!-- Button -->
+<div class="flex w-full px-4 py-3">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-primary text-[#E6E6FA] text-base font-bold leading-normal tracking-[0.015em] font-display shadow-glow hover:bg-primary/90 transition-all duration-300">
+<span class="truncate">Continue</span>
+</button>
+</div>
+</footer>
+</div>
+</body></html>

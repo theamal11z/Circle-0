@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Choose Your Voice</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6a25f4",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#161022",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<button class="flex items-center justify-center h-12 w-12 text-zinc-300 dark:text-zinc-400">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+</div>
+<h1 class="text-zinc-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Your Voice</h1>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 w-12 bg-transparent text-zinc-300 dark:text-zinc-400 text-base font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined text-2xl">info</span>
+</button>
+</div>
+</header>
+<main class="flex-grow flex flex-col px-4">
+<!-- Headline Text -->
+<h2 class="text-zinc-900 dark:text-white tracking-light text-[28px] font-bold leading-tight text-center pb-3 pt-5">Choose Your Voice</h2>
+<!-- Body Text -->
+<p class="text-zinc-600 dark:text-zinc-400 text-base font-normal leading-normal pb-3 pt-1 text-center">Select a filter to protect your identity. Tap an option and speak to hear a preview.</p>
+<!-- Image Grid -->
+<div class="grid grid-cols-2 gap-4 pt-6">
+<div class="relative bg-cover bg-center flex flex-col items-center rounded-full justify-center aspect-square ring-2 ring-primary shadow-[0_0_20px_4px_rgba(106,37,244,0.5)]" data-alt="Abstract glowing purple and blue orb" style='background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuC5jnyICrcnNpri9Gbh2Ng8uCbUusB6J5k_DuD609R2j13QaEPJgx22BxcXqgEGaQUW5mqGLhpUL3WiXSzS6CS5K-UdZNm6EXwogJUy8fcP0xUkePVXBmVZ928s6pSwMruWABqaN5SL9_whK_u-7L-jZYHq-eLuLnilM_yfYPp5X0peyInI2x4MD-hB2pq07-ohQCimB7Rz4iLDQYuNYQJv00BWrF2MpomFiA51-y9MO-Mg2BFmUrA2W5t1YYJmIcqeN-5ZNIyFu0Rz");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Echo</p>
+</div>
+<div class="relative bg-cover bg-center flex flex-col items-center rounded-full justify-center aspect-square" data-alt="Abstract fluid pink and teal gradient" style='background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4QKrtBgiD17g6Aa5FCHPOZT0oBmeGaRl2b_xELo3Dz8GKMKvgFHXH2A5oSLzSxYAHATI5hpTbDbqqUjDZE3h-Sj4R-DWF3p3GgTUed-DW9q-J9l36xS6iuoyMh39yRnIbjBdL0Pkl8GGgPChY-v9FPj6btTt0W1FafDd9fN3DoGueEBygMQjBboEsbhf3vX7pbyacgdoerBrUNOwvugYaFEeoatLPbWPxmD0sKn_mjo5KImTwOZlOxDQZu8j-Mvoe-Ok2Uv0ctfA-");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Dream</p>
+</div>
+<div class="relative bg-cover bg-center flex flex-col items-center rounded-full justify-center aspect-square" data-alt="Soft focused light trails in blue and violet" style='background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCd30cxiThdUnXu1IPyrFSooeCyDgxNEmRRxgYdPeeClEG26VVl45WGDSDSP7kxq0U0qgEPx5l57y3L95o3rjk4P3rGzwT1YkTR7AsQmB0ppLoIgCpiQ-lK_dupW86ckTJXPSyXRj9iOTbz4cv169_vTC-Eeb7r2LUrK8lpxS0rAL-DDtW7AoioNSGa2RWGewe_2lNxdE_PP_YyD2rL11HC1BAnzqWckfCqxUk0fnrqwg8ZsAneShqn242-1V1QIlRvxuxJIAQLuHmH");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Whisper</p>
+</div>
+<div class="relative bg-cover bg-center flex flex-col items-center rounded-full justify-center aspect-square" data-alt="Dark abstract texture with hints of light" style='background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFny1KAq7YxGvYlV4hQb8T3x7TJHLBFuLBqfzRjE58LPgkb83_1_AAYHhkWwULOZfbr4JmKdHD9db4hyw2bbg9tu4uQdkomjOwcrnfheZkliRqMZeh79Zremyq253Kk--9Nf9OnaJ7vc4f4DG3KdHo61bVl6qfvWCAFs9ciMGlAuDVNkdIAkT5q-XS5Gq_uQhZQjOtf-4X1f7DGH8vLSTppYYji6HaJm1GGg5orDn4WHa_nd1PvOd2bvj8XFkxSkMALq6aljhZ6S2C");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Resonance</p>
+</div>
+<div class="relative bg-cover bg-center flex flex-col items-center rounded-full justify-center aspect-square" data-alt="Purple and orange smoke-like pattern" style='background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8E_4t-iJCgmZMlc-GD5KUT2J_pXRkmHnX12icbdSVdjM7WcdZtFO63QMNPQlI6QDdVFEIte7bfhPLfVFcMbT_iKe5QwlbpDAfWih4QFg383a_JZpmbCnY-clAGXKu7xi6v_LeZrPvZ0UVaE2rSPQRtcT3nE-XvyRosFz83k4ZJdZMrCeYRUiUzUvtvxHflrVHQP0BDoW-JU3rqNbo1VGKfx5MbXUwFoGQEQTt513WBCzR8yQbCS8LDAVWmj8NmjDC4Q37iyJeKfDI");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Aura</p>
+</div>
+<div class="relative bg-cover bg-center flex flex-col items-center rounded-full justify-center aspect-square" data-alt="Blue and green abstract light patterns" style='background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBpBXMsfbZYoCQr_sZ1ecUFqeWWHdfDXx_RzFkyWTvvasZFgzUOfbCcqQNx8JUNdVt4QUDf2YTGk8sR7sUwUfKEIAqLAP3ZF6NHoWAv09C_UkpbLl2vF5hz1yZPJ5X3m2sRmR2HWTZxZIkuBJnK07zj0k3lXgnzuPi93W0FiJu8-xWfanHSLxEjOyTuJgsOmmTpSZRl15BEbmXBptzS7apQ-zWn9Xk3nLVU-rPnqSxQ5r5OwEf5LK7sA5qV6tHcSNQrTVQOKH_AK3FT");'>
+<p class="text-white text-base font-bold leading-tight w-[70%] text-center line-clamp-2">Cosmos</p>
+</div>
+</div>
+<div class="flex-grow"></div>
+<!-- Voice Preview & Control Area -->
+<div class="flex flex-col items-center gap-4 py-8">
+<p class="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Tap to Preview Voice</p>
+<button class="flex h-20 w-20 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary text-white shadow-[0_0_20px_0_rgba(106,37,244,0.6)]">
+<span class="material-symbols-outlined text-4xl">mic</span>
+</button>
+</div>
+</main>
+<!-- Confirmation Button -->
+<footer class="sticky bottom-0 bg-background-light dark:bg-background-dark p-4 pt-2">
+<button class="flex w-full max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em]">
+                Confirm
+            </button>
+</footer>
+</div>
+</body></html>

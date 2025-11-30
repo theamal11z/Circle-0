@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>End of Cycle Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#6a25f4",
+            "background-light": "#f6f5f8",
+            "background-dark": "#161022",
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    .glow-effect {
+      text-shadow: 0 0 8px rgba(163, 123, 255, 0.4), 0 0 20px rgba(163, 123, 255, 0.3);
+    }
+    .fragment {
+      position: absolute;
+      background-color: #a37bff;
+      border-radius: 9999px;
+      opacity: 0.7;
+    }
+    .fragment-1 { width: 3px; height: 12px; top: -10%; left: 50%; }
+    .fragment-2 { width: 4px; height: 4px; top: 5%; left: 98%; }
+    .fragment-3 { width: 3px; height: 8px; top: 30%; left: 105%; }
+    .fragment-4 { width: 2px; height: 10px; top: 65%; left: 102%; }
+    .fragment-5 { width: 4px; height: 4px; top: 90%; left: 85%; }
+    .fragment-6 { width: 3px; height: 12px; top: 105%; left: 55%; }
+    .fragment-7 { width: 2px; height: 6px; top: 95%; left: 15%; }
+    .fragment-8 { width: 4px; height: 4px; top: 60%; left: -8%; }
+    .fragment-9 { width: 3px; height: 9px; top: 25%; left: -12%; }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-gradient-to-b from-[#191970] to-[#0C0C0C] font-display">
+<div class="relative flex h-screen min-h-[700px] w-full flex-col items-center justify-between text-white group/design-root overflow-hidden p-6 sm:p-8">
+<!-- Top Spacer -->
+<div class="flex-grow"></div>
+<!-- Central Content -->
+<div class="flex flex-col items-center w-full max-w-md text-center">
+<!-- Animated Graphic Placeholder -->
+<div class="relative w-48 h-48 sm:w-56 sm:h-56 mb-12">
+<div class="absolute inset-0 border-2 border-dashed border-[#A37BFF]/50 rounded-full opacity-60"></div>
+<div class="fragment fragment-1" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-2" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-3" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-4" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-5" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-6" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-7" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-8" data-alt="A small glowing violet fragment drifting upwards."></div>
+<div class="fragment fragment-9" data-alt="A small glowing violet fragment drifting upwards."></div>
+</div>
+<!-- Headline Text -->
+<h1 class="text-white tracking-light text-3xl sm:text-4xl font-bold leading-tight px-4 text-center pb-4 glow-effect">The circle completes its cycle</h1>
+<!-- Body Text -->
+<p class="text-gray-300 text-base font-normal leading-relaxed pb-3 pt-1 px-4 text-center max-w-sm">
+        Let go and rest until the next cycle begins. This is a natural part of the experience.
+      </p>
+</div>
+<!-- Bottom Spacer & CTA -->
+<div class="flex-grow flex flex-col justify-end w-full max-w-md">
+<div class="flex px-4 py-3 justify-center w-full">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-5 flex-1 bg-[#A37BFF] text-black text-base sm:text-lg font-bold leading-normal tracking-wide shadow-[0_4px_30px_rgba(163,123,255,0.35)]">
+<span class="truncate">Take a Break</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

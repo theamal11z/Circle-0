@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
-import Constants from 'expo-constants';
 import { colors, typography, spacing } from '../constants/theme';
 import { CircularProgress } from '../components/CircularProgress';
 import { useStore } from '../store/useStore';
-
-const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+import { auth, firestore, signInAnonymous } from '../config/firebase';
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function CircleMatching() {
   const router = useRouter();
@@ -35,23 +34,37 @@ export default function CircleMatching() {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       setStatusText('Creating your circle...');
 
-      // Call backend to join/create circle
-      const response = await fetch(`${BACKEND_URL}/api/circles/join`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user?.id || 'anonymous',
-        }),
-      });
+      // Ensure we're authenticated (required by Firestore rules)
+      if (!auth.currentUser) {
+        await signInAnonymous();
+      }
 
-      const circle = await response.json();
-      setCurrentCircle(circle);
+      const uid = auth.currentUser?.uid || user?.id || 'anonymous';
+      const circlesRef = collection(firestore, 'circles');
+      const q = query(circlesRef, where('participants', 'array-contains', uid), where('status', '==', 'active'));
+      const snapshot = await getDocs(q);
+
+      let circleDoc: any = null;
+      if (!snapshot.empty) {
+        const docSnap = snapshot.docs[0];
+        circleDoc = { _id: docSnap.id, circleId: docSnap.id, ...(docSnap.data() as any) };
+      } else {
+        const newDoc = await addDoc(circlesRef, {
+          circleId: '',
+          day: 1,
+          status: 'active',
+          participants: [uid],
+          createdAt: serverTimestamp(),
+        });
+        circleDoc = { _id: newDoc.id, circleId: newDoc.id, day: 1, status: 'active', participants: [uid], createdAt: new Date().toISOString() };
+      }
+
+      setCurrentCircle(circleDoc);
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
       router.replace('/circle');
     } catch (error) {
       console.error('Error joining circle:', error);
-      // Continue to circle anyway for demo
       setTimeout(() => {
         router.replace('/circle');
       }, 1000);

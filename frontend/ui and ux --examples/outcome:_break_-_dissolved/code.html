@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>A Quiet Farewell</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#8B5CF6", // Soft Violet
+              "background-light": "#0A0914", // Deep Midnight Black (Forcing dark theme)
+              "background-dark": "#0A0914", // Deep Midnight Black
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            boxShadow: {
+              'glow-primary': '0 0 15px 5px rgba(139, 92, 246, 0.3)',
+              'glow-primary-lg': '0 0 25px 8px rgba(139, 92, 246, 0.4)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .text-glow {
+        text-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-screen w-full flex-col items-center justify-between p-6 dark group/design-root overflow-hidden">
+<!-- Background Glow Effect -->
+<div class="absolute inset-0 z-0 overflow-hidden">
+<div class="absolute -top-1/4 left-1/2 -translate-x-1/2 h-[50vh] w-[50vh] bg-primary/20 rounded-full blur-3xl opacity-30"></div>
+</div>
+<!-- Main Content Area -->
+<div class="relative z-10 flex flex-1 flex-col items-center justify-center text-center">
+<!-- Dissolving Circle Visual -->
+<div class="relative mb-8 flex h-48 w-48 items-center justify-center">
+<!-- Outer glow -->
+<div class="absolute inset-0 rounded-full bg-primary/30 blur-2xl"></div>
+<!-- Inner soft circle -->
+<div class="absolute h-40 w-40 rounded-full bg-background-dark shadow-inner shadow-primary/20"></div>
+<!-- Dissolving Particles - A static representation -->
+<div class="absolute h-full w-full">
+<!-- Top fading particle -->
+<div class="absolute top-[-10px] left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-amber-300/80 opacity-60 blur-sm"></div>
+<!-- Right fading particle -->
+<div class="absolute top-1/4 right-[-12px] h-2.5 w-2.5 rounded-full bg-primary/90 opacity-70 blur-sm"></div>
+<!-- Left fading particle -->
+<div class="absolute top-1/2 left-[-8px] h-2 w-2 rounded-full bg-amber-300/70 opacity-50 blur-sm"></div>
+<!-- Top-left fading particle -->
+<div class="absolute top-[5%] left-[15%] h-2 w-2 rounded-full bg-primary/80 opacity-80 blur-sm"></div>
+<!-- Top-right large particle -->
+<div class="absolute top-[10%] right-[8%] h-3.5 w-3.5 rounded-full bg-primary opacity-60 blur"></div>
+<!-- Bottom-left small particle -->
+<div class="absolute bottom-[20%] left-[10%] h-1.5 w-1.5 rounded-full bg-amber-300/90 opacity-90 blur-sm"></div>
+</div>
+<!-- Center Icon -->
+<span class="material-symbols-outlined text-primary text-6xl opacity-20 text-glow" data-icon="lightbulb_circle"></span>
+</div>
+<!-- Headline Text -->
+<h1 class="text-white text-glow tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-3 pt-6">
+                Your Circle is Complete
+            </h1>
+<!-- Body Text -->
+<p class="text-white/80 text-base font-normal leading-relaxed pb-3 pt-1 px-4 text-center max-w-sm">
+                You have gracefully left the circle. We honor the space you held and the voices you shared. May you carry the warmth of this connection forward on your journey.
+            </p>
+</div>
+<!-- CTA Button at the bottom -->
+<div class="relative z-10 w-full max-w-md pb-4">
+<!-- SingleButton -->
+<div class="flex px-4 py-3">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-5 flex-1 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] shadow-glow-primary transition-all duration-300 hover:shadow-glow-primary-lg active:scale-95">
+<span class="truncate">Begin Anew</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

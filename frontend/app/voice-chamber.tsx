@@ -1,22 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
-import Constants from 'expo-constants';
+import { useAudioRecorder, AudioModule, RecordingPresets, setAudioModeAsync, useAudioRecorderState } from 'expo-audio';
 import { colors, typography, spacing } from '../constants/theme';
 import { useStore } from '../store/useStore';
-
-const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+import { auth, storage, firestore, signInAnonymous } from '../config/firebase';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { Audio as AVAudio } from 'expo-av';
 
 export default function VoiceChamber() {
   const router = useRouter();
   const { segment } = useLocalSearchParams();
-  const { currentCircle, user, messages } = useStore();
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const { currentCircle, user, messages, addMessage } = useStore();
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorderState = useAudioRecorderState(audioRecorder);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [recordingStart, setRecordingStart] = useState<number | null>(null);
+  const soundRef = useRef<AVAudio.Sound | null>(null);
 
   const segmentIndex = parseInt(segment as string) || 0;
   const segmentMessages = messages.filter((m) => m.segmentIndex === segmentIndex);
@@ -24,19 +26,18 @@ export default function VoiceChamber() {
 
   useEffect(() => {
     setupAudio();
-    return () => {
-      if (sound) {
-        sound.unloadAsync();
-      }
-    };
   }, []);
 
   const setupAudio = async () => {
     try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      const status = await AudioModule.requestRecordingPermissionsAsync();
+      if (!status.granted) {
+        Alert.alert('Permission required', 'Microphone access is needed to record.');
+        return;
+      }
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
     } catch (error) {
       console.error('Error setting up audio:', error);
@@ -45,11 +46,9 @@ export default function VoiceChamber() {
 
   const startRecording = async () => {
     try {
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-      setRecording(recording);
-      setIsRecording(true);
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
+      setRecordingStart(Date.now());
     } catch (error) {
       console.error('Failed to start recording:', error);
       Alert.alert('Error', 'Failed to start recording');
@@ -57,18 +56,50 @@ export default function VoiceChamber() {
   };
 
   const stopRecording = async () => {
-    if (!recording) return;
-
     try {
-      setIsRecording(false);
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
-      setRecording(null);
-
+      await audioRecorder.stop();
+      const uri = audioRecorder.uri;
       if (uri) {
-        // Here we would upload to Firebase Storage
-        // For now, just show success
-        Alert.alert('Success', 'Voice message recorded!', [
+        const durationMs = recordingStart ? Math.max(0, Date.now() - recordingStart) : 0;
+        // Ensure authenticated
+        if (!auth.currentUser) {
+          await signInAnonymous();
+        }
+        const uid = auth.currentUser?.uid || user?.id || 'anonymous';
+        const circleId = currentCircle?._id || 'unknown';
+
+        // Convert file uri to Blob
+        const res = await fetch(uri);
+        const blob = await res.blob();
+
+        // Upload to Firebase Storage
+        const path = `circles/${circleId}/${uid}/${Date.now()}.m4a`;
+        const fileRef = storageRef(storage, path);
+        await uploadBytes(fileRef, blob, { contentType: 'audio/m4a' });
+        const downloadUrl = await getDownloadURL(fileRef);
+
+        // Write message metadata to Firestore
+        const docRef = await addDoc(collection(firestore, 'messages'), {
+          circleId,
+          authorId: uid,
+          segmentIndex,
+          audioUrl: downloadUrl,
+          durationMs,
+          createdAt: serverTimestamp(),
+        });
+
+        // Optimistic update
+        addMessage({
+          _id: docRef.id,
+          circleId,
+          authorId: uid,
+          segmentIndex,
+          audioUrl: downloadUrl,
+          durationMs,
+          createdAt: new Date().toISOString(),
+        } as any);
+
+        Alert.alert('Success', 'Voice message sent!', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       }
@@ -77,18 +108,30 @@ export default function VoiceChamber() {
     }
   };
 
-  const playMessage = async (messageId: string) => {
+  const playMessage = async (audioUrl: string) => {
     try {
-      if (isPlaying) {
-        await sound?.stopAsync();
+      // Toggle stop
+      if (isPlaying && soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
         setIsPlaying(false);
         return;
       }
 
-      // Load and play audio
-      // For demo purposes, we'll just show playing state
+      // Load and play
+      const { sound } = await AVAudio.Sound.createAsync({ uri: audioUrl });
+      soundRef.current = sound;
       setIsPlaying(true);
-      setTimeout(() => setIsPlaying(false), 3000);
+      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (!status.isLoaded) return;
+        if ((status as any).didJustFinish) {
+          setIsPlaying(false);
+          soundRef.current?.unloadAsync();
+          soundRef.current = null;
+        }
+      });
     } catch (error) {
       console.error('Error playing message:', error);
     }
@@ -114,7 +157,7 @@ export default function VoiceChamber() {
             <TouchableOpacity
               key={message._id}
               style={styles.messageCard}
-              onPress={() => playMessage(message._id)}
+              onPress={() => playMessage(message.audioUrl)}
               activeOpacity={0.7}
             >
               <View style={styles.waveVisualization}>
@@ -161,19 +204,19 @@ export default function VoiceChamber() {
           <TouchableOpacity
             style={[
               styles.recordButton,
-              isRecording && styles.recordButtonActive,
+              recorderState.isRecording && styles.recordButtonActive,
             ]}
             onPressIn={startRecording}
             onPressOut={stopRecording}
             activeOpacity={0.9}
           >
             <Ionicons
-              name={isRecording ? 'stop' : 'mic'}
+              name={recorderState.isRecording ? 'stop' : 'mic'}
               size={48}
               color={colors.mutedWhite}
             />
           </TouchableOpacity>
-          {isRecording && (
+          {recorderState.isRecording && (
             <View style={styles.recordingIndicator}>
               <View style={styles.recordingDot} />
               <Text style={styles.recordingText}>Recording...</Text>
@@ -268,10 +311,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 5,
-    shadowColor: colors.violetGlow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    boxShadow: '0px 4px 8px rgba(143, 0, 255, 0.3)',
   },
   recordButtonActive: {
     backgroundColor: colors.warmOrange,

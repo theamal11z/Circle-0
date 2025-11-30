@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Anonymous Voice Circle Platform — XML Context & Spec
+  Target stack: Expo (React Native) + Firebase (Auth, Firestore, Storage, Cloud Functions)
+  Use this as a single-file context for designers, devs, or generative UI tools.
+-->
+<project id="anonymous-voice-circle" platform="expo" backend="firebase" created="2025-11-29">
+  <metadata>
+    <name>Anonymous Voice Circle</name>
+    <tagline>Where voices find solace, and souls connect in quiet understanding.</tagline>
+    <summary>
+      Voice-first, time-bounded (7-day) anonymous micro-communities ("circles").
+      Users communicate only through voice messages. Circles close with a ritual vote:
+      Stay / Break / Emerge. Design language: circular geometry, soft dark theme,
+      fluid audio wave animations. Priorities: privacy, low friction, emotional safety.
+    </summary>
+    <techStack>
+      <frontend>Expo / React Native (TypeScript)</frontend>
+      <stateManagement>React Context / Recoil (optional)</stateManagement>
+      <backend>Firebase</backend>
+      <firebaseComponents>
+        <auth>Anonymous Auth (recommended) + optional Phone/Email (opt-in)</auth>
+        <firestore>Cloud Firestore for circle, message metadata, votes, insights</firestore>
+        <storage>Firebase Storage for voice audio files (optimised, small chunks)</storage>
+        <functions>Cloud Functions for post-processing (transcription, tone analysis)</functions>
+        <ml>Optional ML Kit or Cloud Speech-to-Text (for transcription & emotion pipelines)</ml>
+      </firebaseComponents>
+    </techStack>
+  </metadata>
+
+  <!-- Data schema overview -->
+  <dataModel>
+    <collection name="circles">
+      <field name="circleId" type="string" />
+      <field name="createdAt" type="timestamp" />
+      <field name="day" type="integer" description="1..7 current cycle day" />
+      <field name="status" type="string" values="active, voting, closed" />
+      <field name="participants" type="array" description="list of anonymousUserIds" />
+      <field name="settings" type="map">
+        <entry name="maxParticipants" type="integer" />
+        <entry name="voiceMaskOptions" type="array" />
+      </field>
+    </collection>
+
+    <collection name="messages">
+      <field name="messageId" type="string" />
+      <field name="circleId" type="string" />
+      <field name="authorId" type="string" description="anonymous id" />
+      <field name="segmentIndex" type="integer" description="which slice" />
+      <field name="audioPath" type="string" description="storage path to audio file" />
+      <field name="durationMs" type="integer" />
+      <field name="createdAt" type="timestamp" />
+      <field name="transcript" type="string" optional="true" />
+      <field name="emotionalTags" type="map" description="tone, valence, energy" />
+    </collection>
+
+    <collection name="votes">
+      <field name="circleId" type="string" />
+      <field name="userId" type="string" />
+      <field name="choice" type="string" values="stay,break,emerge" />
+      <field name="emergeTarget" type="string" optional="true" description="if choice=emerge -> target authorId" />
+      <field name="createdAt" type="timestamp" />
+    </collection>
+
+    <collection name="archives">
+      <field name="archiveId" type="string" />
+      <field name="circleId" type="string" />
+      <field name="emergedMessageId" type="string" description="if any" />
+      <field name="snapshot" type="map" description="read-only: non-identifiable summary" />
+    </collection>
+  </dataModel>
+
+  <!-- Permissions & privacy -->
+  <privacy>
+    <auth recommended="true">Firebase Anonymous Auth by default. Do not collect PII.</auth>
+    <audioStorage retentionPolicy>Default: keep audio for 30 days after circle closes (configurable). Optionally keep emerged memory if voted.</audioStorage>
+    <ipLogging>Disabled by default; collect only what is required for safety.</ipLogging>
+    <moderation>Optional on-device content scanning + community reporting. Avoid identity exposure.</moderation>
+  </privacy>
+
+  <!-- App navigation + screens -->
+  <navigation entry="Onboarding">
+    <screen id="Onboarding" type="authFlow">
+      <title>Welcome</title>
+      <elements>
+        <hero type="animatedCircle" description="rotating soft-glow circle" />
+        <text primary="Where voices find solace." />
+        <cta id="Begin" action="go:HowItWorks" />
+      </elements>
+    </screen>
+
+    <screen id="HowItWorks">
+      <title>How it works</title>
+      <cards>
+        <card title="7-day circles">Temporary, time-bounded groups for honest sharing.</card>
+        <card title="Voice first">No text, no images, no names — only voice.</card>
+        <card title="Closure ritual">Week ends with Stay / Break / Emerge vote.</card>
+      </cards>
+      <cta id="ChooseMask" action="go:VoiceMask" />
+    </screen>
+
+    <screen id="VoiceMask">
+      <title>Choose a voice mask</title>
+      <description>Optional filters to preserve identity while keeping emotional nuance.</description>
+      <masks>
+        <mask id="raw" label="Raw" preview="onDevice" />
+        <mask id="soft-echo" label="Soft Echo" preview="onDevice" />
+        <mask id="warm-blur" label="Warm Blur" preview="onDevice" />
+        <mask id="deep-calm" label="Deep Calm" preview="onDevice" />
+        <mask id="synthetic-whisper" label="Synthetic Whisper" preview="onDevice" />
+      </masks>
+      <cta id="Continue" action="go:CircleMatch" />
+    </screen>
+
+    <screen id="CircleMatch" type="loading">
+      <title>Entering your circle...</title>
+      <elements>
+        <animation type="glowingRing" />
+        <progress text="Finding a balanced group..." />
+      </elements>
+      <onMatched action="go:MainCircle" />
+    </screen>
+
+    <screen id="MainCircle">
+      <title>Circle — Day {circle.day}</title>
+      <layout type="circularWheel">
+        <center>
+          <element type="dayBadge" value="{circle.day}" />
+          <element type="breathingWave" />
+        </center>
+        <segments count="{circle.participants.length}">
+          <segment prototype="SegmentSlice" />
+        </segments>
+      </layout>
+      <footer>
+        <button id="MySlice" action="go:MySlice">My Slice</button>
+        <button id="ActivityLog" action="go:ActivityLog">Listen Later</button>
+      </footer>
+    </screen>
+
+    <component id="SegmentSlice">
+      <props>
+        <prop name="index" />
+        <prop name="hasNew" type="boolean" />
+        <prop name="lastTone" />
+      </props>
+      <ui>
+        <tap action="go:VoiceChamber?segment={index}" />
+        <visual>
+          <voiceWave live="{hasNew}" />
+          <toneBadge value="{lastTone}" />
+        </visual>
+      </ui>
+    </component>
+
+    <screen id="VoiceChamber">
+      <title>Voice Chamber — Slice {segmentIndex}</title>
+      <layout type="verticalStack">
+        <list id="voiceMessages" source="messages?circle={circleId}&segment={segmentIndex}">
+          <item type="waveBubble">
+            <play action="playAudio({audioPath})" />
+            <meta>
+              <timeAgo value="{createdAt}" />
+              <duration value="{durationMs}" />
+            </meta>
+            <reactions type="silentPulse" optional="true" />
+          </item>
+        </list>
+
+        <recordBar>
+          <micButton behavior="holdToRecord" />
+          <hint>Hold to speak • Release to send • Swipe down to cancel</hint>
+          <filter active="{user.voiceMask}" />
+        </recordBar>
+
+        <insightCard optional="true">
+          <title>Emotional summary</title>
+          <text>{message.emotionalTags.summary}</text>
+          <cta id="LearnMore" action="open:InsightDetails" />
+        </insightCard>
+      </layout>
+    </screen>
+
+    <screen id="MySlice">
+      <title>Your Slice</title>
+      <elements>
+        <waveTimeline source="messages?circle={circleId}&author={anonId}" />
+        <reflectCard>
+          <text>{dailyPrompt}</text>
+          <cta id="RecordResponse" action="open:RecordModal" />
+        </reflectCard>
+      </elements>
+    </screen>
+
+    <screen id="Voting" condition="circle.day == 7">
+      <title>Ritual — Decide Together</title>
+      <options>
+        <option id="stay" label="Stay" description="Continue another week together" />
+        <option id="break" label="Break" description="Dissolve the circle" />
+        <option id="emerge" label="Emerge" description="Select a voice to carry as memory" />
+      </options>
+      <flow>
+        <onSelect id="emerge" action="open:ChooseEmergeTarget" />
+        <onSubmit action="saveVote" />
+      </flow>
+    </screen>
+
+    <screen id="EndOfCycle">
+      <title>Closure</title>
+      <states>
+        <state id="stay">
+          <animation type="circleBloom" />
+          <text>Your circle will continue. Segments may reshuffle.</text>
+        </state>
+        <state id="break">
+          <animation type="lanternDrift" />
+          <text>The circle dissolves. Take the warmth with you.</text>
+        </state>
+        <state id="emerge">
+          <animation type="archiveGlow" />
+          <text>A memory is carried forward.</text>
+        </state>
+      </states>
+      <cta id="Next" action="go:CircleMatch" />
+    </screen>
+
+    <screen id="Settings">
+      <title>Settings & Privacy</title>
+      <items>
+        <toggle id="retainAudio" label="Audio retention (days)" value="30" />
+        <toggle id="anonymousAuth" label="Anonymous account (default)" value="true" />
+        <button id="report" action="open:ReportFlow">Report content</button>
+        <button id="export" action="open:ExportData">Request data / delete</button>
+      </items>
+    </screen>
+  </navigation>
+
+  <!-- UI tokens and theme -->
+  <designSystem>
+    <theme default="dark">
+      <colors>
+        <primary name="midnightBlack" value="#0E0E11" />
+        <primary name="deepIndigo" value="#19192A" />
+        <accent name="violetGlow" value="#7365FF" />
+        <accent name="calmBlue" value="#4D7CFF" />
+        <accent name="warmOrange" value="#FFAE66" />
+        <neutral name="mutedWhite" value="#EAEAF2" />
+      </colors>
+
+      <typography>
+        <font family="Inter" weights="400,600,700" />
+        <sizes>
+          <h1>22</h1>
+          <body>16</body>
+          <caption>12</caption>
+        </sizes>
+      </typography>
+
+      <components>
+        <button radius="20" elevation="low" />
+        <card radius="16" padding="16" />
+        <waveBubble radius="12" animation="fluid" />
+      </components>
+    </theme>
+
+    <motion>
+      <ease type="cubic-bezier(0.22, 1, 0.36, 1)" />
+      <durations>
+        <short>120ms</short>
+        <medium>300ms</medium>
+        <long>700ms</long>
+      </durations>
+    </motion>
+  </designSystem>
+
+  <!-- Backend workflow + cloud functions -->
+  <backendWorkflows>
+    <uploadAudio>
+      <steps>
+        <step>Record chunk in app (opus/ogg recommended)</step>
+        <step>Upload to Firebase Storage with metadata</step>
+        <step>Write message document to Firestore (audioPath, duration, authorId, segmentIndex)</step>
+        <step>Trigger Cloud Function: transcribe & analyse tone (optional)</step>
+        <step>Store transcript & emotionalTags back to message doc</step>
+      </steps>
+    </uploadAudio>
+
+    <transcriptionPipeline optional="true">
+      <engine>Google Cloud Speech-to-Text or on-device ML Kit</engine>
+      <outputs>
+        <output>transcript</output>
+        <output>confidence</output>
+        <output>emotionTags (valence, arousal, dominantEmotion)</output>
+      </outputs>
+    </transcriptionPipeline>
+
+    <votingResolution>
+      <cron>Trigger at circle.day == 7 endTime via Cloud Scheduler</cron>
+      <function>Aggregate votes, compute result, write to archives, set circle.status=closed</function>
+      <postAction>
+        <if result="emerge">copy emergedMessage metadata to archives.emergedMessageId</if>
+        <if result="break">schedule deletion of audio per retentionPolicy</if>
+      </postAction>
+    </votingResolution>
+  </backendWorkflows>
+
+  <!-- Analytics & safety -->
+  <analytics>
+    <events>
+      <event>circle_joined</event>
+      <event>message_sent</event>
+      <event>vote_submitted</event>
+      <event>report_submitted</event>
+    </events>
+    <safety>
+      <reportFlow>Users can report a message; reports stored in Firestore restricted collection</reportFlow>
+      <moderation>Option: Cloud Function to flag high-risk keywords (configurable); escalate to human review</moderation>
+    </safety>
+  </analytics>
+
+  <!-- Developer notes -->
+  <notes>
+    <note>Use short, efficient audio codecs (opus) to keep storage & bandwidth low on mobile.</note>
+    <note>Prefer on-device preliminary voice masking and client-side obfuscation before upload to preserve privacy.</note>
+    <note>Default to anonymous auth; allow explicit opt-in for non-anonymous features (never required).</note>
+    <note>Keep UI text minimal — the product is voice-first. Use microcopy only for guidance and safety.</note>
+  </notes>
+</project>

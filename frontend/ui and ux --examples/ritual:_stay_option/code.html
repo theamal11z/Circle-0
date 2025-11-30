@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stay With Your Circle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#6a25f4",
+            "background-light": "#f6f5f8",
+            "background-dark": "#161022",
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display">
+<div class="relative flex h-screen min-h-[800px] w-full flex-col bg-[#0C0A14] dark group/design-root overflow-hidden">
+<!-- Background Gradient -->
+<div class="absolute inset-0 z-0">
+<div class="absolute top-0 left-0 w-3/4 h-3/4 bg-[#1A182D] rounded-full blur-[150px] opacity-30"></div>
+<div class="absolute bottom-0 right-0 w-1/2 h-1/2 bg-[#9D81E9] rounded-full blur-[200px] opacity-20"></div>
+</div>
+<div class="relative z-10 flex flex-col items-center justify-between flex-grow px-4 py-8 text-center">
+<!-- Top Content -->
+<div class="flex flex-col items-center">
+<h1 class="text-[#EAE6FF] tracking-tight text-[32px] font-bold leading-tight pt-12 pb-3">Stay with your circle</h1>
+<p class="text-[#685D8D] text-base font-normal leading-normal pb-3 pt-1 max-w-xs">Choose to begin a new week together. Your voices will be here.</p>
+</div>
+<!-- Central Interactive Element -->
+<div class="relative flex items-center justify-center w-full my-8">
+<button class="relative flex items-center justify-center w-56 h-56 rounded-full cursor-pointer bg-gradient-to-br from-[#1A182D] to-[#0C0A14] focus:outline-none focus:ring-4 focus:ring-[#9D81E9]/30">
+<!-- Outer Glow -->
+<div class="absolute inset-0 bg-[#9D81E9] rounded-full blur-3xl opacity-30"></div>
+<!-- Inner solid circle -->
+<div class="w-full h-full rounded-full" style="box-shadow: 0 0 0 1px rgba(157, 129, 233, 0.2), inset 0 0 20px rgba(12, 10, 20, 0.8);"></div>
+</button>
+</div>
+<!-- Bottom Content -->
+<div class="flex flex-col items-center">
+<p class="text-[#EAE6FF] text-base font-normal leading-normal pb-3 pt-1">Hold to Stay</p>
+<p class="text-[#685D8D] text-sm font-normal leading-normal pb-3 pt-1 underline cursor-pointer">Decide Later</p>
+</div>
+</div>
+</div>
+</body></html>

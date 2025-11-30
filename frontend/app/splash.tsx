@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors, typography, spacing } from '../constants/theme';
 import { CircularProgress } from '../components/CircularProgress';
+import { useStore } from '../store/useStore';
 
 const { height } = Dimensions.get('window');
 
 export default function Splash() {
   const router = useRouter();
+  const { user, hasCompletedOnboarding } = useStore();
   const [fadeAnim] = useState(new Animated.Value(0));
   const [scaleAnim] = useState(new Animated.Value(0.8));
 
@@ -27,13 +29,21 @@ export default function Splash() {
       }),
     ]).start();
 
-    // Navigate after 3 seconds
+    // Guarded navigation
     const timer = setTimeout(() => {
-      router.replace('/auth-choice');
-    }, 3000);
+      if (user) {
+        if (hasCompletedOnboarding) {
+          router.replace('/circle-matching');
+        } else {
+          router.replace('/welcome');
+        }
+      } else {
+        router.replace('/auth-choice');
+      }
+    }, 1500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [user, hasCompletedOnboarding]);
 
   return (
     <View style={styles.container}>
