@@ -1,0 +1,22 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "audio": {
+      "circles": {
+        "$circleId": {
+          "$userId": {
+            "$timestamp": {
+              ".read": "auth != null",
+              ".write": "auth != null && auth.uid === $userId",
+              ".validate": "newData.hasChildren(['content','mimeType','createdAt'])",
+              "content": { ".validate": "newData.isString() && newData.val().length > 0" },
+              "mimeType": { ".validate": "newData.val() === 'audio/m4a'" },
+              "createdAt": { ".validate": "newData.isNumber()" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

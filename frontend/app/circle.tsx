@@ -5,7 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../constants/theme';
 import { useStore } from '../store/useStore';
 import { auth, firestore, signInAnonymous } from '../config/firebase';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { BreathingWave } from '../components/BreathingWave';
 
 export default function Circle() {
   const router = useRouter();
@@ -15,43 +16,66 @@ export default function Circle() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (currentCircle) {
-      loadMessages();
-    }
-  }, [currentCircle]);
+    if (!currentCircle?._id) return;
 
-  const loadMessages = async () => {
-    try {
-      setLoadError(null);
-      setLoadingMessages(true);
-      if (!currentCircle?._id) return;
-      // Ensure authenticated before querying (rules require auth)
-      if (!auth.currentUser) {
-        await signInAnonymous();
+    // Set up real-time listener for messages
+    const setupMessageListener = async () => {
+      try {
+        setLoadError(null);
+        setLoadingMessages(true);
+
+        // Ensure authenticated before querying
+        if (!auth.currentUser) {
+          await signInAnonymous();
+        }
+
+        const messagesRef = collection(firestore, 'messages');
+        const q = query(
+          messagesRef,
+          where('circleId', '==', currentCircle._id),
+          orderBy('createdAt', 'asc')
+        );
+
+        // Real-time listener
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            const data = snapshot.docs.map((d) => ({ _id: d.id, ...(d.data() as any) }));
+            setMessages(data as any);
+            setLoadingMessages(false);
+          },
+          (error) => {
+            console.error('Error in message listener:', error);
+            setLoadError('Failed to sync messages');
+            setLoadingMessages(false);
+          }
+        );
+
+        return unsubscribe;
+      } catch (error) {
+        console.error('Error setting up message listener:', error);
+        setLoadError('Failed to load messages');
+        setLoadingMessages(false);
       }
-      const messagesRef = collection(firestore, 'messages');
-      const q = query(
-        messagesRef,
-        where('circleId', '==', currentCircle._id),
-        orderBy('createdAt', 'asc')
-      );
-      const snap = await getDocs(q);
-      const data = snap.docs.map((d) => ({ _id: d.id, ...(d.data() as any) }));
-      setMessages(data as any);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      setLoadError('Failed to load messages');
-    } finally {
-      setLoadingMessages(false);
-    }
-  };
+    };
+
+    const unsubscribePromise = setupMessageListener();
+
+    // Cleanup listener on unmount
+    return () => {
+      unsubscribePromise.then((unsubscribe) => {
+        if (unsubscribe) unsubscribe();
+      });
+    };
+  }, [currentCircle?._id]);
 
   const segments = Array.from({ length: 7 }, (_, i) => i);
   const day = currentCircle?.day || 3;
+  const isAlone = (currentCircle?.participants?.length || 0) <= 1;
 
   const handleSegmentPress = (index: number) => {
     setActiveSegment(index);
-    router.push(`/voice-chamber?segment=${index}`);
+    router.push(`/voice-chamber?segment=${index}` as any);
   };
 
   const renderSegment = (index: number, angle: number) => {
@@ -98,12 +122,24 @@ export default function Circle() {
     );
   };
 
+  const dailyPrompts = [
+    "What's one thing you're grateful for today?",
+    "Describe a moment that made you smile recently.",
+    "What's a challenge you overcame this week?",
+    "Share a memory that brings you peace.",
+    "What does 'home' feel like to you?",
+    "If you could send a message to your younger self, what would it be?",
+    "What are you looking forward to tomorrow?",
+  ];
+
+  const currentPrompt = dailyPrompts[(day - 1) % dailyPrompts.length];
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Your Circle</Text>
-        <TouchableOpacity onPress={() => router.push('/settings')}>
+        <TouchableOpacity onPress={() => router.push('/settings' as any)}>
           <Ionicons name="settings-outline" size={24} color={colors.mutedWhite} />
         </TouchableOpacity>
       </View>
@@ -115,6 +151,12 @@ export default function Circle() {
           <Text style={styles.dayLabel}>7 Day Cycle</Text>
         </View>
 
+        {/* Daily Reflection Prompt */}
+        <View style={styles.promptContainer}>
+          <Text style={styles.promptLabel}>Daily Reflection</Text>
+          <Text style={styles.promptText}>"{currentPrompt}"</Text>
+        </View>
+
         {/* Circle Visualization */}
         <View style={styles.circleContainer}>
           <View style={styles.circle}>
@@ -123,12 +165,10 @@ export default function Circle() {
               return renderSegment(index, angle);
             })}
 
-            {/* Center content */}
+            {/* Center content with breathing wave */}
             <View style={styles.centerContent}>
-              <Text style={styles.membersCount}>7 Members</Text>
-              <View style={styles.waveIndicator}>
-                <Ionicons name="radio-outline" size={32} color={colors.violetGlow} />
-              </View>
+              <BreathingWave size={80} />
+              <Text style={styles.membersCount}>{currentCircle?.participants?.length || 1} / 7 Members</Text>
               <Text style={styles.tapHint}>Tap a glowing light to listen</Text>
             </View>
           </View>
@@ -142,7 +182,7 @@ export default function Circle() {
           </View>
         )}
         {!!loadError && (
-          <View style={[styles.infoCard, { marginTop: spacing.lg }]}> 
+          <View style={[styles.infoCard, { marginTop: spacing.lg }]}>
             <Ionicons name="warning-outline" size={20} color={colors.warmOrange} />
             <Text style={styles.infoText}>{loadError}</Text>
           </View>
@@ -150,27 +190,46 @@ export default function Circle() {
 
         {/* Info Card */}
         <View style={styles.infoCard}>
-          <Ionicons name="information-circle-outline" size={20} color={colors.calmBlue} />
+          <Ionicons name="information-circle-outline" size={24} color={colors.calmBlue} />
           <Text style={styles.infoText}>
-            Each voice represents a member. Share your thoughts by tapping your segment.
+            {isAlone
+              ? "Waiting for others to join. You'll be notified when your circle grows."
+              : "New voices have joined. Listen to their stories and share your own."}
           </Text>
         </View>
       </ScrollView>
 
       {/* Footer Actions */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => router.push('/voice-chamber?segment=0')}
-        >
-          <Ionicons name="mic" size={24} color={colors.violetGlow} />
-          <Text style={styles.actionText}>My Slice</Text>
-        </TouchableOpacity>
+        {day === 7 ? (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.votingButton]}
+            onPress={() => router.push('/voting' as any)}
+          >
+            <Ionicons name="checkmark-circle" size={28} color={colors.mutedWhite} />
+            <Text style={[styles.actionText, styles.votingText]}>Vote Now</Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push('/my-slice' as any)}
+            >
+              <Ionicons name="time-outline" size={24} color={colors.mutedWhite} />
+              <Text style={styles.actionText}>My Slice</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="headset-outline" size={24} color={colors.calmBlue} />
-          <Text style={styles.actionText}>Listen Later</Text>
-        </TouchableOpacity>
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push('/listen-later' as any)}
+            >
+              <Ionicons name="bookmarks-outline" size={24} color={colors.mutedWhite} />
+              <Text style={styles.actionText}>Listen Later</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );
@@ -194,53 +253,66 @@ const styles = StyleSheet.create({
     color: colors.mutedWhite,
   },
   scrollContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingBottom: 100,
   },
   dayBadge: {
-    alignSelf: 'center',
-    backgroundColor: colors.deepIndigo,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: 20,
-    marginBottom: spacing.xl,
-    borderWidth: 1,
-    borderColor: colors.violetGlow,
+    alignItems: 'center',
+    marginTop: spacing.lg,
   },
   dayNumber: {
-    ...typography.h2,
-    color: colors.warmOrange,
-    textAlign: 'center',
+    ...typography.h1,
+    color: colors.violetGlow,
+    fontSize: 36,
   },
   dayLabel: {
     ...typography.caption,
     color: colors.gray,
-    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+  },
+  promptContainer: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    padding: spacing.md,
+    backgroundColor: colors.deepIndigo + '80', // Semi-transparent
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.calmBlue,
+  },
+  promptLabel: {
+    ...typography.caption,
+    color: colors.calmBlue,
+    marginBottom: spacing.xs,
+    fontWeight: '600',
+  },
+  promptText: {
+    ...typography.body,
+    color: colors.mutedWhite,
+    fontStyle: 'italic',
   },
   circleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: spacing.xl,
+    height: 400,
+    marginTop: spacing.md,
   },
   circle: {
     width: 300,
     height: 300,
-    borderRadius: 150,
-    borderWidth: 2,
-    borderColor: colors.violetGlow,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
   },
   segment: {
     position: 'absolute',
-    width: 48,
-    height: 48,
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   segmentInner: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: colors.deepIndigo,
     borderWidth: 2,
     borderColor: colors.gray,
@@ -257,10 +329,8 @@ const styles = StyleSheet.create({
   membersCount: {
     ...typography.body,
     color: colors.mutedWhite,
-    marginBottom: spacing.sm,
-  },
-  waveIndicator: {
-    marginVertical: spacing.sm,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
   },
   tapHint: {
     ...typography.caption,
@@ -273,6 +343,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: spacing.md,
     marginTop: spacing.lg,
+    marginHorizontal: spacing.lg,
   },
   infoText: {
     ...typography.body,
@@ -283,21 +354,44 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: spacing.lg,
-    paddingBottom: spacing.xl,
     backgroundColor: colors.deepIndigo,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    paddingVertical: spacing.md,
+    paddingBottom: spacing.xl,
+    borderTopWidth: 1,
+    borderTopColor: colors.midnightBlack,
   },
   actionButton: {
+    flex: 1,
     alignItems: 'center',
-    padding: spacing.sm,
+    justifyContent: 'center',
   },
   actionText: {
     ...typography.caption,
     color: colors.mutedWhite,
-    marginTop: spacing.xs,
+    marginTop: 4,
+  },
+  divider: {
+    width: 1,
+    backgroundColor: colors.gray,
+    opacity: 0.3,
+    marginVertical: 8,
+  },
+  votingButton: {
+    backgroundColor: colors.violetGlow,
+    marginHorizontal: spacing.lg,
+    borderRadius: 12,
+    paddingVertical: spacing.sm,
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  votingText: {
+    ...typography.h3,
+    color: colors.mutedWhite,
+    marginTop: 0,
   },
 });

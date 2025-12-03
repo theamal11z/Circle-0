@@ -35,8 +35,7 @@ export default function HowItWorks() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const handleContinue = async () => {
-    await completeOnboarding();
-    router.replace('/circle-matching');
+    router.push('/voice-mask' as any);
   };
 
   return (

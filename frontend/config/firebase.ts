@@ -8,6 +8,7 @@ const mod = Platform.OS === 'web' ? require('./firebase.web') : require('./fireb
 export const auth = mod.auth;
 export const storage = mod.storage;
 export const firestore = mod.firestore;
+export const database = mod.database;
 export const signInAnonymous = mod.signInAnonymous;
 export const signUpWithEmail = mod.signUpWithEmail;
 export const signInWithEmail = mod.signInWithEmail;

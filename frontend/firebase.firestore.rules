@@ -5,7 +5,7 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Helper to check if the signed-in user is a participant of the circle
+    // Helper to check if the signed-in user is a participant of the circle via GET (used for messages rules)
     function isCircleParticipant(circleId) {
       return isSignedIn() &&
         get(/databases/$(database)/documents/circles/$(circleId)).data.participants.hasAny([request.auth.uid]);
@@ -13,7 +13,11 @@ service cloud.firestore {
 
     // Circles: only participants can read/update. Any signed-in user can create a new circle that includes them.
     match /circles/{circleId} {
-      allow read: if isCircleParticipant(circleId);
+      // Use resource.data for read checks to avoid extra get() during queries
+      allow read: if isSignedIn() && (
+        resource.data.participants.hasAny([request.auth.uid]) || 
+        resource.data.status == 'active'
+      );
 
       // Create: must be signed in and include themselves in participants array
       allow create: if isSignedIn() &&
@@ -37,7 +41,10 @@ service cloud.firestore {
       allow create: if isSignedIn() &&
         request.resource.data.authorId == request.auth.uid &&
         isCircleParticipant(request.resource.data.circleId) &&
-        request.resource.data.audioUrl is string &&
+        (
+          request.resource.data.audioUrl is string ||
+          request.resource.data.rtdbPath is string
+        ) &&
         request.resource.data.segmentIndex is int &&
         request.resource.data.durationMs is int;
 

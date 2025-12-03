@@ -9,7 +9,7 @@ const { height } = Dimensions.get('window');
 
 export default function Splash() {
   const router = useRouter();
-  const { user, hasCompletedOnboarding } = useStore();
+  const { user, hasCompletedOnboarding, sessionRestored } = useStore();
   const [fadeAnim] = useState(new Animated.Value(0));
   const [scaleAnim] = useState(new Animated.Value(0.8));
 
@@ -29,7 +29,12 @@ export default function Splash() {
       }),
     ]).start();
 
-    // Guarded navigation
+    // Wait for session restoration before navigating
+    if (!sessionRestored) {
+      return;
+    }
+
+    // Navigate based on user state
     const timer = setTimeout(() => {
       if (user) {
         if (hasCompletedOnboarding) {
@@ -43,7 +48,7 @@ export default function Splash() {
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [user, hasCompletedOnboarding]);
+  }, [user, hasCompletedOnboarding, sessionRestored]);
 
   return (
     <View style={styles.container}>
@@ -57,7 +62,7 @@ export default function Splash() {
         ]}
       >
         <CircularProgress size={250} />
-        
+
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Aura</Text>
           <Text style={styles.tagline}>Where voices find solace</Text>

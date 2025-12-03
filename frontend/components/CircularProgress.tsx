@@ -1,101 +1,170 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
-import { colors } from '../constants/theme';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, typography, spacing } from '../constants/theme';
+
+const { width } = Dimensions.get('window');
 
 interface CircularProgressProps {
   size?: number;
-  progress?: number;
+  animated?: boolean;
 }
 
-export const CircularProgress: React.FC<CircularProgressProps> = ({ size = 200, progress = 0 }) => {
-  const animatedValue = React.useRef(new Animated.Value(0)).current;
+export function CircularProgress({ size = 200, animated = true }: CircularProgressProps) {
+  const [rotateAnim] = useState(new Animated.Value(0));
+  const [pulseAnim] = useState(new Animated.Value(1));
+  const [glowAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    Animated.loop(
+    if (!animated) return;
+
+    // Rotation animation
+    const rotation = Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 3000,
+        useNativeDriver: true,
+      })
+    );
+
+    // Pulse animation
+    const pulse = Animated.loop(
       Animated.sequence([
-        Animated.timing(animatedValue, {
-          toValue: 1,
-          duration: 3000,
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 1500,
           useNativeDriver: true,
         }),
-        Animated.timing(animatedValue, {
-          toValue: 0,
-          duration: 3000,
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1500,
           useNativeDriver: true,
         }),
       ])
-    ).start();
-  }, []);
+    );
 
-  const scale = animatedValue.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [1, 1.1, 1],
+    // Glow animation
+    const glow = Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    rotation.start();
+    pulse.start();
+    glow.start();
+
+    return () => {
+      rotation.stop();
+      pulse.stop();
+      glow.stop();
+    };
+  }, [animated]);
+
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
   });
 
-  const opacity = animatedValue.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.3, 0.8, 0.3],
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.8],
   });
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
+      {/* Outer glow ring */}
+      <Animated.View
+        style={[
+          styles.glowRing,
+          {
+            width: size * 1.2,
+            height: size * 1.2,
+            borderRadius: (size * 1.2) / 2,
+            opacity: glowOpacity,
+          },
+        ]}
+      />
+
+      {/* Main rotating circle */}
       <Animated.View
         style={[
           styles.circle,
-          styles.outerCircle,
           {
             width: size,
             height: size,
             borderRadius: size / 2,
-            transform: [{ scale }],
-            opacity,
+            transform: [{ rotate: spin }, { scale: pulseAnim }],
           },
         ]}
-      />
-      <Animated.View
-        style={[
-          styles.circle,
-          styles.middleCircle,
-          {
-            width: size * 0.7,
-            height: size * 0.7,
-            borderRadius: (size * 0.7) / 2,
-          },
-        ]}
-      />
-      <View
-        style={[
-          styles.circle,
-          styles.innerCircle,
-          {
-            width: size * 0.4,
-            height: size * 0.4,
-            borderRadius: (size * 0.4) / 2,
-          },
-        ]}
-      />
+      >
+        {/* Inner gradient effect */}
+        <View style={styles.innerCircle}>
+          <Ionicons name="radio-outline" size={size * 0.4} color={colors.violetGlow} />
+        </View>
+      </Animated.View>
+
+      {/* Decorative dots */}
+      {[0, 1, 2, 3, 4, 5, 6].map((index) => {
+        const angle = (360 / 7) * index;
+        const radian = (angle * Math.PI) / 180;
+        const x = Math.cos(radian) * (size / 2 - 10);
+        const y = Math.sin(radian) * (size / 2 - 10);
+
+        return (
+          <Animated.View
+            key={index}
+            style={[
+              styles.dot,
+              {
+                left: size / 2 + x - 4,
+                top: size / 2 + y - 4,
+                opacity: glowOpacity,
+              },
+            ]}
+          />
+        );
+      })}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  glowRing: {
+    position: 'absolute',
+    backgroundColor: colors.violetGlow,
+    opacity: 0.2,
   },
   circle: {
-    position: 'absolute',
-    borderWidth: 2,
-  },
-  outerCircle: {
+    borderWidth: 3,
     borderColor: colors.violetGlow,
-  },
-  middleCircle: {
-    borderColor: colors.calmBlue,
-    opacity: 0.5,
+    backgroundColor: colors.deepIndigo,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   innerCircle: {
-    borderColor: colors.violetGlow,
-    opacity: 0.3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dot: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.calmBlue,
   },
 });

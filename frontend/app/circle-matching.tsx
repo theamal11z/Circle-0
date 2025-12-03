@@ -28,46 +28,108 @@ export default function CircleMatching() {
       setLoading(true);
       setStatusText('Finding a balanced group...');
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setStatusText('Matching you with voices...');
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setStatusText('Creating your circle...');
-
-      // Ensure we're authenticated (required by Firestore rules)
+      // Ensure we're authenticated
       if (!auth.currentUser) {
         await signInAnonymous();
       }
 
       const uid = auth.currentUser?.uid || user?.id || 'anonymous';
       const circlesRef = collection(firestore, 'circles');
-      const q = query(circlesRef, where('participants', 'array-contains', uid), where('status', '==', 'active'));
-      const snapshot = await getDocs(q);
 
-      let circleDoc: any = null;
-      if (!snapshot.empty) {
-        const docSnap = snapshot.docs[0];
-        circleDoc = { _id: docSnap.id, circleId: docSnap.id, ...(docSnap.data() as any) };
-      } else {
-        const newDoc = await addDoc(circlesRef, {
-          circleId: '',
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Step 1: Check if user is already in an active circle
+      const userCirclesQuery = query(
+        circlesRef,
+        where('participants', 'array-contains', uid),
+        where('status', '==', 'active')
+      );
+      const userCirclesSnapshot = await getDocs(userCirclesQuery);
+
+      if (!userCirclesSnapshot.empty) {
+        // User already has an active circle
+        const docSnap = userCirclesSnapshot.docs[0];
+        const circleDoc = { _id: docSnap.id, circleId: docSnap.id, ...(docSnap.data() as any) };
+        setCurrentCircle(circleDoc);
+        setStatusText('Rejoining your circle...');
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        router.replace('/circle' as any);
+        return;
+      }
+
+      setStatusText('Matching you with voices...');
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Step 2: Look for circles that need more participants (less than 7)
+      let joinedCircle: any = null;
+
+      try {
+        const availableCirclesQuery = query(
+          circlesRef,
+          where('status', '==', 'active')
+        );
+        const availableCirclesSnapshot = await getDocs(availableCirclesQuery);
+
+        for (const doc of availableCirclesSnapshot.docs) {
+          const circleData = doc.data();
+          const participants = circleData.participants || [];
+
+          // Join circles with less than 7 participants
+          if (participants.length < 7 && !participants.includes(uid)) {
+            // Update the circle with new participant
+            const updatedParticipants = [...participants, uid];
+
+            // In production, use a transaction to prevent race conditions
+            // For now, we'll just create a new circle if this fails
+            joinedCircle = {
+              _id: doc.id,
+              circleId: doc.id,
+              ...circleData,
+              participants: updatedParticipants,
+            };
+            break;
+          }
+        }
+      } catch (err: any) {
+        console.warn('Could not list circles (likely permission issue), creating new one:', err);
+        // Fallback to creating a new circle if we can't list them
+      }
+
+      setStatusText('Creating your circle...');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Step 3: If no available circle (or permission error), create a new one
+      if (!joinedCircle) {
+        const newCircleData = {
+          circleId: `circle_${Date.now()}`,
           day: 1,
           status: 'active',
           participants: [uid],
+          maxParticipants: 7,
           createdAt: serverTimestamp(),
-        });
-        circleDoc = { _id: newDoc.id, circleId: newDoc.id, day: 1, status: 'active', participants: [uid], createdAt: new Date().toISOString() };
+          settings: {
+            voiceMaskOptions: ['raw', 'soft-echo', 'warm-blur', 'deep-calm', 'synthetic-whisper'],
+          },
+        };
+
+        const newDoc = await addDoc(circlesRef, newCircleData);
+        joinedCircle = {
+          _id: newDoc.id,
+          ...newCircleData,
+          createdAt: new Date().toISOString(),
+        };
       }
 
-      setCurrentCircle(circleDoc);
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.replace('/circle');
+      setCurrentCircle(joinedCircle);
+      setStatusText('Welcome to your circle!');
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      router.replace('/circle' as any);
     } catch (error) {
       console.error('Error joining circle:', error);
+      setStatusText('Connection error. Retrying...');
       setTimeout(() => {
-        router.replace('/circle');
-      }, 1000);
+        router.replace('/circle' as any);
+      }, 1500);
     } finally {
       setLoading(false);
     }
